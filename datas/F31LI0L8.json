@@ -1,0 +1,23 @@
+{
+    "preview": "웹 서버 코드 작성",
+    "created_at": "2021-07-01T00:00:00",
+    "owner": "cykim8811",
+    "history": [
+        {
+            "role": "user",
+            "content": "웹 서버 코드 작성 어떻게 해?"
+        },
+        {
+            "role": "assistant",
+            "content": "이렇게 하면 될 것 같아요."
+        },
+        {
+            "role": "user",
+            "content": "왜 그렇게 생각하지?"
+        },
+        {
+            "role": "assistant",
+            "content": "이유는 이렇게 생각해요."
+        }
+    ]
+}

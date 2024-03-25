@@ -6,8 +6,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
 
 const InputContainer = styled.div`
-  width: 100%;
-  height: 3rem;
+  width: min(100%, 40rem);
+  height: ${({ lineCount }) => `${lineCount * 1.5 + 2}rem`};
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -18,13 +18,14 @@ const InputContainer = styled.div`
   margin-bottom: 2rem;
 `;
 
-const Input = styled.input`
+const Input = styled.textarea`
   width: calc(100% - 8rem);
-  height: 2rem;
+  height: ${({ lineCount }) => `${lineCount * 1.5}rem`};
   border: none;
   outline: none;
   margin: 0 1rem;
   font-size: 1rem;
+  resize: none;
   font-family: "Noto Sans KR", sans-serif;
 `;
 
@@ -50,7 +51,7 @@ const ChatInput = ({ onSubmit }) => {
   };
 
   const handleKeyDown = (e) => {
-    if (e.key === "Enter" && !e.shiftKey && value.trim() !== "") {
+    if (e.key === "Enter" && e.ctrlKey && value.trim() !== "") {
       e.preventDefault();
       onSubmit(value);
       setValue("");
@@ -58,12 +59,14 @@ const ChatInput = ({ onSubmit }) => {
   };
 
   return (
-    <InputContainer>
+    <InputContainer lineCount={value.split("\n").length}>
       <Input
         type="text"
-        value={value}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
+        lineCount={value.split("\n").length}
+        value={value}
+        placeholder="Type your message here"
       />
       <SendBtn onClick={handleSubmit} />
     </InputContainer>

@@ -85,39 +85,69 @@ def stream_ask(messages):
         if batch_data:
             yield batch_data
 
+import json
 @app.get("/api/history")
 async def history():
+    with open("history.json", "r") as json_file:
+        history_list = json.load(json_file)
     return [
         {
             "id": key,
-            "preview": message_db[key]["preview"],
-        } for key in message_db.keys()
+            "preview": value["preview"],
+        } for key, value in history_list.items()
     ]
 
 @app.get("/api/history/{id}")
 async def history(id: str):
-    res = message_db[id]
-    return res
+    if os.path.exists("datas/" + id + ".json"):
+        with open("datas/" + id + ".json", "r") as json_file:
+            history_data = json.load(json_file)
+        return history_data
 
 @app.post("/api/chat/{id}")
 async def chat(request: Request, id: str):
     data = await request.json()
-    message_db[id]["history"].append({
+    with open("datas/" + id + ".json", "r") as json_file:
+        history_data = json.load(json_file)
+    history_data["history"].append({
         "role": "user",
         "content": data["content"]
     })
     def stream_chat():
-        gen = stream_ask(message_db[id]["history"])
+        gen = stream_ask(history_data["history"])
         total_data = ""
         for text in gen:
             total_data += text
             yield text
-        message_db[id]["history"].append({
+        history_data["history"].append({
             "role": "assistant",
             "content": total_data
         })
+        with open("datas/" + id + ".json", "w") as json_file:
+            json.dump(history_data, json_file)
     return StreamingResponse(stream_chat(), media_type="text/plain")
 
-@app.get("/api/ask")
-async def ask(messages: Any):
-    return StreamingResponse(stream_ask(json.loads(messages)), media_type="text/plain")
+@app.post("/api/edit/{id}/{index}")
+async def edit(request: Request, id: str, index: int):
+    data = await request.json()
+    with open("datas/" + id + ".json", "r") as json_file:
+        history_data = json.load(json_file)
+    original_msg = history_data["history"][index]
+    history_data["history"] = history_data["history"][:index]
+    history_data["history"].append({
+        "role": original_msg["role"],
+        "content": data["content"]
+    })
+    def stream_chat():
+        gen = stream_ask(history_data["history"])
+        total_data = ""
+        for text in gen:
+            total_data += text
+            yield text
+        history_data["history"].append({
+            "role": "assistant",
+            "content": total_data
+        })
+        with open("datas/" + id + ".json", "w") as json_file:
+            json.dump(history_data, json_file)
+    return StreamingResponse(stream_chat(), media_type="text/plain")

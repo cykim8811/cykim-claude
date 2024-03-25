@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useRecoilValue } from "recoil";
 import selectedContextAtom from "../stores/selectedContext";
+import { Scrollbar } from "react-scrollbars-custom";
 
 const ChatSectionContainer = styled.div`
   width: min-content;
@@ -16,13 +17,18 @@ const ChatSectionContainer = styled.div`
   background-color: #fff;
 `;
 
-const ChatSectionInnerContainer = styled.div`
-  width: min(100%, 40rem);
-  height: 100%;
+const ChatSectionInnerContainer = styled(Scrollbar)`
+  width: 100%;
+  height: calc(100% - 3rem);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
+  & > div > div > div {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+  }
 `;
 
 const ChatHeader = styled.div`
@@ -52,6 +58,8 @@ const ChatSection = () => {
         .catch((err) => {
           console.log(err);
         });
+    } else {
+      setChatData(null);
     }
   }, [selectedContext]);
 
@@ -81,8 +89,8 @@ const ChatSection = () => {
       <ChatHeader />
       <ChatSectionInnerContainer>
         <ChatList chatData={chatData} />
-        <ChatInput onSubmit={handleSubmit} />
       </ChatSectionInnerContainer>
+      <ChatInput onSubmit={handleSubmit} />
     </ChatSectionContainer>
   );
 };

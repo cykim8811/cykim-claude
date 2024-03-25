@@ -3,7 +3,7 @@ import ChatBubble from "./ChatBubble";
 import PropTypes from "prop-types";
 
 const ChatListContainer = styled.div`
-  width: 100%;
+  width: min(100%, 40rem);
   height: 100%;
   display: flex;
   flex-direction: column;
